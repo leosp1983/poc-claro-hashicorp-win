@@ -1,0 +1,1 @@
+# poc-claro-hashicorp-win
