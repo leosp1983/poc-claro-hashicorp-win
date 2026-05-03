@@ -153,7 +153,4 @@
 
 - name: Exibir o conteudo do arquivo de relatorio
   ansible.builtin.debug:
-    msg: "{{ item }}"
-  loop: "{{ report_content.stdout_lines }}"
-  loop_control:
-    label: "Linha"
+    msg: "{{ report_content.stdout_lines }}"
