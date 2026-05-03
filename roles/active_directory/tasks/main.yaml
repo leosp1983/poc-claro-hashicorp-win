@@ -47,7 +47,7 @@
     upn: "{{ ad_user_upn }}"
     password: "{{ lookup('env', 'AD_USER_INITIAL_PASSWORD') | default('P@ssw0rd_PoC!') }}"
     password_never_expires: false
-    account_enabled: true
+    enabled: true
     path: "{{ ad_user_ou }}"
     state: present
     update_password: on_create
