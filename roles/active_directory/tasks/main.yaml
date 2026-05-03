@@ -33,7 +33,7 @@
   ansible.builtin.set_fact:
     log_group: >-
       [{{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}] GRUPO '{{ ad_group_name }}'
-      {{ 'CRIADO com sucesso' if result_group.changed else 'já existia (sem alteração)' }}
+      {{ 'CRIADO com sucesso' if result_group.changed else 'ja existia (sem alteracao)' }}
       na OU: {{ ad_group_ou }}
 
 # ------------------------------------------------------------------
@@ -56,8 +56,8 @@
 - name: Registrar resultado da criação do usuário
   ansible.builtin.set_fact:
     log_user: >-
-      [{{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}] USUÁRIO '{{ ad_user_name }}'
-      {{ 'CRIADO com sucesso' if result_user.changed else 'já existia (sem alteração)' }}
+      [{{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}] USUARIO '{{ ad_user_name }}'
+      {{ 'CRIADO com sucesso' if result_user.changed else 'ja existia (sem alteracao)' }}
       | UPN: {{ ad_user_upn }}
       | OU: {{ ad_user_ou }}
 
@@ -79,8 +79,8 @@
 - name: Registrar resultado da associação usuário-grupo
   ansible.builtin.set_fact:
     log_membership: >-
-      [{{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}] USUÁRIO '{{ ad_user_name }}'
-      {{ 'ADICIONADO ao grupo' if result_membership.changed else 'já era membro do grupo' }}
+      [{{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}] USUARIO '{{ ad_user_name }}'
+      {{ 'ADICIONADO ao grupo' if result_membership.changed else 'ja era membro do grupo' }}
       '{{ ad_group_name }}'
 
 # ------------------------------------------------------------------
@@ -96,7 +96,7 @@
   ansible.builtin.set_fact:
     log_folder: >-
       [{{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}] PASTA '{{ ad_report_base_path }}'
-      {{ 'CRIADA com sucesso' if result_folder.changed else 'já existia (sem alteração)' }}
+      {{ 'CRIADA com sucesso' if result_folder.changed else 'ja existia (sem alteracao)' }}
 
 # ------------------------------------------------------------------
 # 5. Gerar e salvar arquivo de relatório com todas as ações
@@ -105,7 +105,7 @@
   ansible.windows.win_copy:
     content: |
       ============================================================
-       RELATORIO DE EXECUCAO — POC CLARO HASHICORP WIN
+       RELATORIO DE EXECUCAO - POC CLARO HASHICORP WIN
        Gerado em: {{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}
        Dominio   : {{ ad_domain }}
        Executado por Ansible Automation Platform + HashiCorp Vault
@@ -151,6 +151,9 @@
   ansible.windows.win_shell: Get-Content "{{ ad_report_base_path }}\\{{ ad_report_file }}"
   register: report_content
 
-- name: Exibir o conteúdo do arquivo de relatório
+- name: Exibir o conteudo do arquivo de relatorio
   ansible.builtin.debug:
-    msg: "{{ report_content.stdout }}"
+    msg: "{{ item }}"
+  loop: "{{ report_content.stdout_lines }}"
+  loop_control:
+    label: "Linha"
