@@ -1,0 +1,153 @@
+---
+# ============================================================
+# Role: active_directory — tasks/main.yaml
+#
+# Executa as seguintes etapas no Active Directory e no host DC:
+#   1. Criar grupo de segurança no AD
+#   2. Criar usuário no AD
+#   3. Inserir o usuário no grupo
+#   4. Criar pasta de relatório no servidor
+#   5. Gerar e salvar arquivo de relatório com todas as ações
+#   6. Ler e exibir o conteúdo do arquivo de relatório
+#
+# Credenciais injetadas pelo AAP via Vault:
+#   AD_USER     → usuário administrador do domínio
+#   AD_PASSWORD → senha do administrador do domínio
+#   AD_HOST     → hostname/IP do Domain Controller
+# ============================================================
+
+# ------------------------------------------------------------------
+# 1. Criar grupo de segurança no Active Directory
+# ------------------------------------------------------------------
+- name: Criar grupo de segurança no Active Directory
+  microsoft.ad.group:
+    name: "{{ ad_group_name }}"
+    description: "{{ ad_group_description }}"
+    scope: "{{ ad_group_scope }}"
+    category: "{{ ad_group_category }}"
+    organizational_unit: "{{ ad_group_ou }}"
+    state: present
+  register: result_group
+
+- name: Registrar resultado da criação do grupo
+  ansible.builtin.set_fact:
+    log_group: >-
+      [{{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}] GRUPO '{{ ad_group_name }}'
+      {{ 'CRIADO com sucesso' if result_group.changed else 'já existia (sem alteração)' }}
+      na OU: {{ ad_group_ou }}
+
+# ------------------------------------------------------------------
+# 2. Criar usuário no Active Directory
+# ------------------------------------------------------------------
+- name: Criar usuário no Active Directory
+  microsoft.ad.user:
+    name: "{{ ad_user_name }}"
+    display_name: "{{ ad_user_display_name }}"
+    description: "{{ ad_user_description }}"
+    user_principal_name: "{{ ad_user_upn }}"
+    password: "{{ lookup('env', 'AD_USER_INITIAL_PASSWORD') | default('P@ssw0rd_PoC!') }}"
+    password_never_expires: false
+    account_enabled: true
+    organizational_unit: "{{ ad_user_ou }}"
+    state: present
+    update_password: on_create
+  register: result_user
+
+- name: Registrar resultado da criação do usuário
+  ansible.builtin.set_fact:
+    log_user: >-
+      [{{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}] USUÁRIO '{{ ad_user_name }}'
+      {{ 'CRIADO com sucesso' if result_user.changed else 'já existia (sem alteração)' }}
+      | UPN: {{ ad_user_upn }}
+      | OU: {{ ad_user_ou }}
+
+# ------------------------------------------------------------------
+# 3. Inserir o usuário no grupo
+# ------------------------------------------------------------------
+- name: Inserir o usuário no grupo
+  microsoft.ad.group:
+    name: "{{ ad_group_name }}"
+    members:
+      add:
+        - "{{ ad_user_upn }}"
+    state: present
+  register: result_membership
+
+- name: Registrar resultado da associação usuário-grupo
+  ansible.builtin.set_fact:
+    log_membership: >-
+      [{{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}] USUÁRIO '{{ ad_user_name }}'
+      {{ 'ADICIONADO ao grupo' if result_membership.changed else 'já era membro do grupo' }}
+      '{{ ad_group_name }}'
+
+# ------------------------------------------------------------------
+# 4. Criar pasta de relatório no servidor (Domain Controller)
+# ------------------------------------------------------------------
+- name: Criar pasta de relatório no servidor
+  ansible.windows.win_file:
+    path: "{{ ad_report_base_path }}"
+    state: directory
+  register: result_folder
+
+- name: Registrar resultado da criação da pasta
+  ansible.builtin.set_fact:
+    log_folder: >-
+      [{{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}] PASTA '{{ ad_report_base_path }}'
+      {{ 'CRIADA com sucesso' if result_folder.changed else 'já existia (sem alteração)' }}
+
+# ------------------------------------------------------------------
+# 5. Gerar e salvar arquivo de relatório com todas as ações
+# ------------------------------------------------------------------
+- name: Gerar e salvar arquivo de relatório
+  ansible.windows.win_copy:
+    content: |
+      ============================================================
+       RELATÓRIO DE EXECUÇÃO — POC CLARO HASHICORP WIN
+       Gerado em: {{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}
+       Domínio   : {{ ad_domain }}
+       Executado por Ansible Automation Platform + HashiCorp Vault
+      ============================================================
+
+      AÇÕES REALIZADAS:
+      ----------------------------------------------------------
+      {{ log_group }}
+
+      {{ log_user }}
+
+      {{ log_membership }}
+
+      {{ log_folder }}
+
+      [{{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}] ARQUIVO '{{ ad_report_file }}' CRIADO em {{ ad_report_base_path }}
+
+      RESUMO:
+      ----------------------------------------------------------
+        Grupo criado  : {{ ad_group_name }} ({{ ad_group_scope }} / {{ ad_group_category }})
+        Usuário criado: {{ ad_user_name }} ({{ ad_user_display_name }})
+        Membro do grupo: {{ ad_group_name }}
+        Pasta do relatório: {{ ad_report_base_path }}
+        Arquivo de relatório: {{ ad_report_file }}
+
+      ============================================================
+       FIM DO RELATÓRIO
+      ============================================================
+    dest: "{{ ad_report_base_path }}\\{{ ad_report_file }}"
+  register: result_file
+
+- name: Registrar resultado da criação do arquivo
+  ansible.builtin.set_fact:
+    log_file: >-
+      [{{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}] ARQUIVO '{{ ad_report_file }}'
+      {{ 'CRIADO com sucesso' if result_file.changed else 'atualizado' }}
+      em {{ ad_report_base_path }}
+
+# ------------------------------------------------------------------
+# 6. Ler e exibir o conteúdo do arquivo de relatório
+# ------------------------------------------------------------------
+- name: Ler o conteúdo do arquivo de relatório
+  ansible.windows.win_shell: Get-Content "{{ ad_report_base_path }}\\{{ ad_report_file }}"
+  register: report_content
+
+- name: Exibir o conteúdo do arquivo de relatório
+  ansible.builtin.debug:
+    msg: "{{ report_content.stdout_lines }}"

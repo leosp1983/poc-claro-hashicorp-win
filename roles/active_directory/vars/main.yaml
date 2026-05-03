@@ -1,0 +1,26 @@
+---
+# ============================================================
+# Role: active_directory — vars/main.yaml
+# ============================================================
+
+# --- Domínio Active Directory ---
+ad_domain: "lcs.local"
+ad_domain_dn: "DC=lcs,DC=local"
+
+# --- Grupo a ser criado ---
+ad_group_name: "GRP_POC_HASHICORP"
+ad_group_description: "Grupo criado via automação Ansible - POC HashiCorp"
+ad_group_scope: "Global"
+ad_group_category: "Security"
+ad_group_ou: "OU=homelab,DC=lcs,DC=local"
+
+# --- Usuário a ser criado ---
+ad_user_name: "usr_poc_hashicorp"
+ad_user_display_name: "POC HashiCorp User"
+ad_user_description: "Usuário criado via automação Ansible - POC HashiCorp"
+ad_user_ou: "OU=users,OU=homelab,DC=lcs,DC=local"
+ad_user_upn: "usr_poc_hashicorp@lcs.local"
+
+# --- Pasta e arquivo de relatório ---
+ad_report_base_path: "C:\\Reports\\POC_HashiCorp"
+ad_report_file: "poc_hashicorp_report.txt"

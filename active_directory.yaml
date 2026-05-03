@@ -1,0 +1,31 @@
+---
+# ============================================================
+# Playbook: active_directory.yaml
+# Automação de Active Directory — POC Claro HashiCorp Win
+#
+# Ações executadas:
+#   1. Criar grupo de segurança no AD
+#   2. Criar usuário no AD
+#   3. Inserir o usuário no grupo
+#   4. Criar pasta no servidor
+#   5. Criar arquivo de relatório com todas as ações
+#   6. Ler e exibir o arquivo de relatório
+#
+# As credenciais (ansible_user / ansible_password) são injetadas
+# automaticamente pelo AAP via credencial "Windows" do tipo Machine,
+# configurada com lookup no HashiCorp Vault (secret: poc-hashicorp-win).
+# NÃO armazene credenciais neste arquivo.
+# ============================================================
+- name: Automação Active Directory — POC Claro HashiCorp Win
+  hosts: "{{ lookup('env', 'AD_HOST') | default('10.10.10.3') }}"
+  gather_facts: false
+  connection: winrm
+
+  vars:
+    ansible_winrm_transport: ntlm
+    ansible_port: 5985
+
+  tasks:
+    - name: Executar automação do Active Directory via role
+      ansible.builtin.include_role:
+        name: active_directory
