@@ -25,7 +25,7 @@
     description: "{{ ad_group_description }}"
     scope: "{{ ad_group_scope }}"
     category: "{{ ad_group_category }}"
-    organizational_unit: "{{ ad_group_ou }}"
+    path: "{{ ad_group_ou }}"
     state: present
   register: result_group
 
@@ -44,11 +44,11 @@
     name: "{{ ad_user_name }}"
     display_name: "{{ ad_user_display_name }}"
     description: "{{ ad_user_description }}"
-    user_principal_name: "{{ ad_user_upn }}"
+    upn: "{{ ad_user_upn }}"
     password: "{{ lookup('env', 'AD_USER_INITIAL_PASSWORD') | default('P@ssw0rd_PoC!') }}"
     password_never_expires: false
     account_enabled: true
-    organizational_unit: "{{ ad_user_ou }}"
+    path: "{{ ad_user_ou }}"
     state: present
     update_password: on_create
   register: result_user
