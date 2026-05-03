@@ -45,7 +45,7 @@
     display_name: "{{ ad_user_display_name }}"
     description: "{{ ad_user_description }}"
     upn: "{{ ad_user_upn }}"
-    password: "{{ lookup('env', 'AD_USER_INITIAL_PASSWORD') | default('P@ssw0rd_PoC!') }}"
+    password: "{{ lookup('env', 'AD_USER_INITIAL_PASSWORD') | default(ad_user_initial_password, true) }}"
     password_never_expires: false
     enabled: true
     path: "{{ ad_user_ou }}"
