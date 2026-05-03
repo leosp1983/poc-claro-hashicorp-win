@@ -65,11 +65,10 @@
 # 3. Inserir o usuário no grupo
 # ------------------------------------------------------------------
 - name: Inserir o usuário no grupo
-  microsoft.ad.group:
+  microsoft.ad.group_membership:
     name: "{{ ad_group_name }}"
     members:
-      add:
-        - "{{ ad_user_upn }}"
+      - "{{ ad_user_upn }}"
     state: present
   register: result_membership
 
