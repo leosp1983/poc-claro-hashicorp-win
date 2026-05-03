@@ -26,4 +26,4 @@ ad_report_base_path: "C:\\Reports\\POC_HashiCorp"
 ad_report_file: "poc_hashicorp_report.txt"
 
 # --- Senha inicial do usuário (fallback quando AD_USER_INITIAL_PASSWORD não está definido no AAP) ---
-ad_user_initial_password: "C0mpl3x_P@ss_2026_#Claro!Hashi"
+ad_user_initial_password: "XyZ_98765!#Abc_Qwerty_2026_Claro"

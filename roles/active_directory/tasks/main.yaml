@@ -50,7 +50,7 @@
     enabled: true
     path: "{{ ad_user_ou }}"
     state: present
-    update_password: on_create
+    update_password: always
   register: result_user
 
 - name: Registrar resultado da criação do usuário
