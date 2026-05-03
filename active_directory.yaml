@@ -18,7 +18,7 @@
 # ============================================================
 - name: Automação Active Directory — POC Claro HashiCorp Win
   hosts: windows
-  gather_facts: false
+  gather_facts: true
   connection: winrm
 
   vars:
