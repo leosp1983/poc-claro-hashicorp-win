@@ -17,7 +17,7 @@
 # NÃO armazene credenciais neste arquivo.
 # ============================================================
 - name: Automação Active Directory — POC Claro HashiCorp Win
-  hosts: "{{ lookup('env', 'AD_HOST') | default('10.10.10.3') }}"
+  hosts: windows
   gather_facts: false
   connection: winrm
 
