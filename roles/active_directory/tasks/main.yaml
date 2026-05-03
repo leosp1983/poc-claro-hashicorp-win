@@ -105,13 +105,13 @@
   ansible.windows.win_copy:
     content: |
       ============================================================
-       RELATÓRIO DE EXECUÇÃO — POC CLARO HASHICORP WIN
+       RELATORIO DE EXECUCAO — POC CLARO HASHICORP WIN
        Gerado em: {{ now(utc=false, fmt='%Y-%m-%dT%H:%M:%S') }}
-       Domínio   : {{ ad_domain }}
+       Dominio   : {{ ad_domain }}
        Executado por Ansible Automation Platform + HashiCorp Vault
       ============================================================
 
-      AÇÕES REALIZADAS:
+      ACOES REALIZADAS:
       ----------------------------------------------------------
       {{ log_group }}
 
@@ -126,13 +126,13 @@
       RESUMO:
       ----------------------------------------------------------
         Grupo criado  : {{ ad_group_name }} ({{ ad_group_scope }} / {{ ad_group_category }})
-        Usuário criado: {{ ad_user_name }} ({{ ad_user_display_name }})
+        Usuario criado: {{ ad_user_name }} ({{ ad_user_display_name }})
         Membro do grupo: {{ ad_group_name }}
-        Pasta do relatório: {{ ad_report_base_path }}
-        Arquivo de relatório: {{ ad_report_file }}
+        Pasta do relatorio: {{ ad_report_base_path }}
+        Arquivo de relatorio: {{ ad_report_file }}
 
       ============================================================
-       FIM DO RELATÓRIO
+       FIM DO RELATORIO
       ============================================================
     dest: "{{ ad_report_base_path }}\\{{ ad_report_file }}"
   register: result_file
@@ -153,4 +153,4 @@
 
 - name: Exibir o conteúdo do arquivo de relatório
   ansible.builtin.debug:
-    msg: "{{ report_content.stdout_lines }}"
+    msg: "{{ report_content.stdout }}"
